@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using DatingWebApp.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace DatingWebApp.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ValuesController : ControllerBase
@@ -19,6 +23,7 @@ namespace DatingWebApp.Controllers
         {
             this._context = context;
         }
+        [AllowAnonymous]
         // GET api/values
         [HttpGet]
         public async Task<IActionResult> Get()
@@ -29,7 +34,7 @@ namespace DatingWebApp.Controllers
 
            return Ok( values );
         }
-       
+        [Authorize]
         // GET api/values/5
         [HttpGet("{id}")]
         public ActionResult<string> Get(int id)

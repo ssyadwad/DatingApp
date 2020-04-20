@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using DatingWebApp.Contract;
 using DatingWebApp.Data;
 using DatingWebApp.Services;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -15,7 +18,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-
+using Microsoft.IdentityModel.Tokens;
 namespace DatingWebApp
 {
     public class Startup
@@ -40,10 +43,29 @@ namespace DatingWebApp
                 options.Lockout.DefaultLockoutTimeSpan = new TimeSpan(0, 1, 0);
                 options.Lockout.MaxFailedAccessAttempts = 5;
                
-
             });
             services.AddCors();
             services.AddScoped<IAuthRepository, AuthServiceLogin>();
+            var issuer = Configuration["AppSettings:Token:Issuer"];
+            var audience = Configuration["AppSettings:Token:Audience"];
+            var key = Configuration["AppSettings:Token:key"];
+            services.AddAuthentication(options=>{ options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+               
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    ValidateAudience = false,
+                    ValidateIssuer = false,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)),
+                    ValidateLifetime=true
+                };
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

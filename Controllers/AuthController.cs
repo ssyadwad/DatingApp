@@ -32,6 +32,7 @@ namespace DatingWebApp.Controllers
         [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody]UserViewModel userViewModel)
         {
+            
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -52,6 +53,7 @@ namespace DatingWebApp.Controllers
             }
             else
             {
+                
                 return BadRequest("User Already exists");
             }
         }
